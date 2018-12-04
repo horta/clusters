@@ -1,0 +1,114 @@
+if [ "$PS1" ];
+then
+  clear
+fi
+
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+umask u=rwx,g=rwx,o=
+
+unset SSH_ASKPASS
+pushd `dirname ${BASH_SOURCE[0]}` > /dev/null
+export SYSTEM=`pwd -P`
+popd > /dev/null
+
+typeset -A config
+config=(
+    [MYDATA]=""
+    [MYSOFTWARE]=""
+    [CLUSTER_NAME]=""
+    [BREW_DIR]=""
+)
+
+while read line
+do
+    if echo $line | grep -F = &>/dev/null
+    then
+        varname=$(echo "$line" | cut -d '=' -f 1)
+        config[$varname]=$(echo "$line" | cut -d '=' -f 2-)
+    fi
+done < $SYSTEM/.bashrc2019.cfg
+
+
+export HOMEBREW_PREFIX="$SYSTEM/${config[BREW_DIR]}"
+export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
+export HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX/Homebrew"
+
+
+export PATH=$HOMEBREW_PREFIX/bin:$PATH
+export PATH=$HOMEBREW_PREFIX/sbin:$PATH
+export PATH=$SYSTEM/bin:$PATH
+
+export MANPATH=$HOMEBREW_PREFIX/share/man:$MANPATH
+export INFOPATH=$HOMEBREW_PREFIX/share/info:$INFOPATH
+
+export MYDATA=${config[MYDATA]}/`whoami`
+export MYSOFTWARE=${config[MYSOFTWARE]}/`whoami`
+export MYCONDA=$MYSOFTWARE/conda-envs
+export CONDA_ENVS_PATH=$MYCONDA
+export CLUSTER_NAME=${config[CLUSTER_NAME]}
+export XDG_RUNTIME_DIR=""
+export LC_ALL="en_US.UTF-8"
+
+export EDITOR="vim"
+export HDF5_USE_FILE_LOCKING=FALSE
+
+export PKG_CONFIG_PATH=/usr/share/pkgconfig
+
+alias cluster='git --git-dir=$HOME/.cconf/ --work-tree=$SYSTEM'
+
+[ -f $SYSTEM/${config[BREW_DIR]}/etc/bash_completion ] && . $SYSTEM/${config[BREW_DIR]}/etc/bash_completion
+
+mkdir -p $MYDATA || true
+mkdir -p $MYSOFTWARE || true
+mkdir -p $MYCONDA || true
+mkdir -p $HOME/.config/nvim || true
+
+if [ ! -e $HOME/.vimrc ]; then
+    echo "set mouse=" >$HOME/.vimrc
+    echo "syntax on" >>$HOME/.vimrc
+fi
+
+if [ ! -f $HOME/.config/nvim/init.vim ]; then
+    touch $HOME/.config/nvim/init.vim
+fi
+
+has_mouse=`cat $HOME/.config/nvim/init.vim | grep -E "set mouse="`
+if [[ -z "${has_mouse// }" ]];
+then
+    echo "set mouse=" >> "$HOME/.config/nvim/init.vim"
+fi
+
+if [ ! -f ~/.ssh/ssh-agent ]; then
+    ssh-agent -s > ~/.ssh/ssh-agent
+fi
+
+# Check if the ssh-agent is already running
+if [[ "$(ps -u $USER | grep ssh-agent | wc -l)" -lt "1" ]]; then
+    ssh-agent -s > ~/.ssh/ssh-agent
+    . ~/.ssh/ssh-agent >/dev/null
+    if [ -e ~/.ssh/id_rsa ]
+    then
+        ssh-add ~/.ssh/id_rsa
+    fi
+else
+    . ~/.ssh/ssh-agent >/dev/null
+fi
+
+. $SYSTEM/anaconda3/etc/profile.d/conda.sh
+
+if [ "$PS1" ];
+then
+    let DIFF=(`date +%s`-`date +%s -r $SYSTEM`)/86400
+    echo "Hello `whoami` and welcome to Stegle system :-)"
+    stegle help
+
+    if [ ! -f $HOME/.$TERM.ti ]; then
+        infocmp $TERM | sed 's/kbs=^[hH]/kbs=\\177/' > $HOME/.$TERM.ti
+        tic $HOME/.$TERM.ti
+    fi
+fi
+
+conda activate base

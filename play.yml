@@ -1,0 +1,19 @@
+---
+- hosts: clusters
+  remote_user: horta
+  tasks:
+    - name: Ensure linuxbrew repo is there
+      git:
+        repo: 'https://github.com/Homebrew/brew.git'
+        dest: "{{ syspath }}/.linuxbrew/Homebrew"
+        version: master
+        update: no
+    - name: Creates directory
+      file: path="{{ syspath }}/.linuxbrew/bin" state=directory
+    - name: Link to bin folder
+      file:
+        src: "{{ syspath }}/.linuxbrew/Homebrew/bin/brew"
+        dest: "{{ syspath }}/.linuxbrew/bin/brew"
+        owner: horta
+        group: stegle-group
+        state: link
