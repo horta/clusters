@@ -17,3 +17,20 @@
         owner: horta
         group: stegle-group
         state: link
+    - name: Download .bashrc
+      get_url:
+        url: https://raw.githubusercontent.com/horta/clusters/master/.bashrc2019
+        dest: "{{ syspath }}/.bashrc2019"
+        mode: 0555
+    - name: Download .bashrc.cfg.j2
+      get_url:
+        url: https://raw.githubusercontent.com/horta/clusters/master/.bashrc2019.cfg.j2
+        dest: "{{ syspath }}/.bashrc2019.cfg.j2"
+        mode: 0555
+    - name: Set .bashrc.cfg up
+      template:
+        src: "{{ syspath }}/.bashrc2019.cfg.j2"
+        dest: "{{ syspath }}/.bashrc2019.cfg"
+        owner: horta
+        group: stegle-group
+        mode: 0555
