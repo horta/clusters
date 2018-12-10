@@ -1,0 +1,12 @@
+---
+- hosts: clusters
+  remote_user: horta
+  tasks:
+    - name: Create ~/.bashrc
+      template:
+        src: user-bashrc.j2
+        dest: ~/.bashrc
+        owner: horta
+        group: stegle-group
+        mode: "u=rwx,g=rx,o="
+        backup: yes

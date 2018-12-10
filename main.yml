@@ -1,0 +1,6 @@
+---
+- hosts: clusters
+roles:
+   - {role: stegle-base}
+   - {role: linuxbrew}
+   - {role: anaconda}

@@ -1,0 +1,32 @@
+---
+# tasks file for anaconda
+- name: Check if anaconda already exist
+  stat:
+    path: '{{ anaconda_install_dir }}/bin/conda'
+  changed_when: false
+  register: anaconda_conda_binary
+
+- when: not anaconda_conda_binary.stat.exists
+  block:
+    - name: Download the installer
+      get_url:
+        url: '{{anaconda_installer_url}}'
+        dest: ~/{{anaconda_installer_sh}}
+        timeout: '{{anaconda_timeout_seconds}}'
+        checksum: '{{anaconda_checksum}}'
+        mode: 0755
+
+    - name: Install anaconda
+      command: ~/{{anaconda_installer_sh}} -b -p {{anaconda_install_dir}}
+      args:
+        creates: '{{anaconda_install_dir}}'
+
+  always:
+    - name: Delete the installer
+      file:
+        path: ~/{{anaconda_installer_sh}}
+        state: absent
+
+- name: Update conda packages
+  when: anaconda_pkg_update
+  command: '{{anaconda_install_dir}}/bin/conda update -y --all'

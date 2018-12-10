@@ -1,0 +1,116 @@
+---
+- name: Update homebrew and upgrade all packages
+  homebrew:
+    update_homebrew: yes
+    upgrade_all: yes
+- name: Install rust
+  async: 14400
+  poll: 50
+  homebrew:
+    name:
+      - rust
+- name: Install linux headers
+  homebrew:
+    name:
+      - linux-headers
+- name: Install languages
+  homebrew:
+    name:
+      - go
+      - lua
+      - luarocks
+      - jdk
+      - node
+- name: Install shells
+  homebrew:
+    name:
+      - bash
+      - fish
+      - zsh
+- name: Install editors
+  homebrew:
+    name:
+      - neovim
+      - vim
+      - emacs
+      - gnu-sed
+- name: Install compression tools
+  homebrew:
+    name:
+      - p7zip
+      - pbzip2
+      - gzip
+      - lbzip2
+      - gnu-tar
+- name: Install genetic tools
+  homebrew:
+    name:
+      - vcftools
+      - samtools
+      - bedtools
+      - bowtie2
+- name: Install monitoring tools
+  homebrew:
+    name:
+      - iperf
+      - glances
+      - htop
+- name: Install synchronizers
+  homebrew:
+    name:
+      - rsync
+      - syncthing
+- name: Install toolchains
+  homebrew:
+    name:
+      - cmake
+      - automake
+      - swig
+      - doxygen
+      - boost
+      - sphinx-doc
+      - ant
+      - patchelf
+      - check
+      - gpatch
+      - help2man
+- name: Install package managers
+  homebrew:
+    name:
+      - brew-gem
+      - brew-pip
+- name: Install version control tools
+  homebrew:
+    name:
+      - git
+      - git-lfs
+- name: Install terminal multiplexers
+  homebrew:
+    name:
+      - tmate
+      - tmux
+- name: Install numeric libraries
+  homebrew:
+    name:
+      - arpack
+      - gsl
+      - isl
+- name: Install terminal helpers
+  homebrew:
+    name:
+      - bat
+      - tldr
+      - fzf
+      - fzy
+      - wget
+      - parallel
+- name: Install misc libraries
+  homebrew:
+    name:
+      - libgcrypt
+      - libidn
+      - libtiff
+- name: Make sure it is all up-to-date
+  homebrew:
+    update_homebrew: yes
+    upgrade_all: yes

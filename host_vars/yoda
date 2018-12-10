@@ -1,0 +1,4 @@
+syspath=/nfs/software/stegle/system
+mydata=/hps/nobackup/stegle/users
+mysoftware=/nfs/software/stegle/users
+cluster_name=YODA

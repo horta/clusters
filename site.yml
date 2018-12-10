@@ -1,0 +1,6 @@
+---
+- name: Set up EBI cluster for Stegle group
+  hosts: clusters
+  roles:
+    - stegle-base
+    - linuxbrew

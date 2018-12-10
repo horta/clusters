@@ -1,0 +1,3 @@
+[clusters]
+ebi ansible_user=horta ansible_host=ebi-login
+yoda ansible_user=horta ansible_host=yoda-login

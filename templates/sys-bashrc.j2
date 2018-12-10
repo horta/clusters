@@ -18,6 +18,7 @@ typeset -A config
 config=(
     [MYDATA]=""
     [MYSOFTWARE]=""
+    [CONDA_FOLDER]=""
     [CLUSTER_NAME]=""
     [BREW_DIR]=""
 )
@@ -29,13 +30,12 @@ do
         varname=$(echo "$line" | cut -d '=' -f 1)
         config[$varname]=$(echo "$line" | cut -d '=' -f 2-)
     fi
-done < $SYSTEM/.bashrc2019.cfg
-
+done < $SYSTEM/.bashrc{{ sysver }}.cfg
 
 export HOMEBREW_PREFIX="$SYSTEM/${config[BREW_DIR]}"
 export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
 export HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX/Homebrew"
-
+export HOMEBREW_CACHE="$SYSTEM/.cache/Homebrew"
 
 export PATH=$HOMEBREW_PREFIX/bin:$PATH
 export PATH=$HOMEBREW_PREFIX/sbin:$PATH
@@ -43,6 +43,14 @@ export PATH=$SYSTEM/bin:$PATH
 
 export MANPATH=$HOMEBREW_PREFIX/share/man:$MANPATH
 export INFOPATH=$HOMEBREW_PREFIX/share/info:$INFOPATH
+
+if [ test -d /scratch ];
+then
+    export TMP=/scratch
+    export TEMP=$TMP
+    export TMPDIR=$TMP
+    export HOMEBREW_TEMP=$TMP
+fi
 
 export MYDATA=${config[MYDATA]}/`whoami`
 export MYSOFTWARE=${config[MYSOFTWARE]}/`whoami`
@@ -97,7 +105,9 @@ else
     . ~/.ssh/ssh-agent >/dev/null
 fi
 
-. $SYSTEM/anaconda3/etc/profile.d/conda.sh
+if [ -f $SYSTEM/${config[CONDA_FOLDER]}/etc/profile.d/conda.sh ]; then
+    . $SYSTEM/${config[CONDA_FOLDER]}/etc/profile.d/conda.sh
+fi
 
 if [ "$PS1" ];
 then
@@ -111,4 +121,7 @@ then
     fi
 fi
 
-conda activate base
+if [ type conda >/dev/null 2>&1 ];
+then
+    conda activate
+fi
