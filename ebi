@@ -1,1 +1,0 @@
-yoda-login ansible_user=horta syspath=/nfs/software/stegle/system mydata=/hps/nobackup/stegle/users mysoftware=/nfs/software/stegle/users conda_folder=anaconda531 cluster_name=YODA sysver=2019
