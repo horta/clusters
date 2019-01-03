@@ -1,2 +1,2 @@
-sysver=2019
-conda_folder=anaconda531
+sysver: 2019
+conda_folder: anaconda531

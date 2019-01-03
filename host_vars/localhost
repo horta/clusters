@@ -1,4 +1,4 @@
 syspath: /nfs/research1/stegle/system
 mydata: /hps/nobackup2/research/stegle/users
 mysoftware: /nfs/research1/stegle/users
-cluster_name: EBI
+cluster_name: localhost

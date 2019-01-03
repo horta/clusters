@@ -1,15 +1,42 @@
 ---
+- name: Ensure linuxbrew repo is there
+  git:
+    repo: 'https://github.com/Homebrew/brew.git'
+    dest: "{{ syspath }}/.linuxbrew/Homebrew"
+    version: master
+    update: no
+    depth: 1
+- name: Ensure linuxbrew repo permissions
+  file:
+    path: "{{ syspath }}/.linuxbrew"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    recurse: yes
+    follow: false
+    modification_time: "preserve"
+- name: Create linuxbrew/bin directory
+  file: path="{{ syspath }}/.linuxbrew/bin" state=directory
+- name: Link brew to bin folder
+  file:
+    src: "{{ syspath }}/.linuxbrew/Homebrew/bin/brew"
+    dest: "{{ syspath }}/.linuxbrew/bin/brew"
+    owner: horta
+    group: stegle-group
+    state: link
 - name: Update homebrew and upgrade all packages
   homebrew:
     update_homebrew: yes
     upgrade_all: yes
 - name: Install rust
+  environment: "{{homebrew_temp}}"
   async: 14400
   poll: 50
   homebrew:
     name:
       - rust
 - name: Install linux headers
+  environment: "{{homebrew_temp}}"
   homebrew:
     name:
       - linux-headers
@@ -110,7 +137,20 @@
       - libgcrypt
       - libidn
       - libtiff
+- name: Install anaconda3
+  homebrew_cask:
+    name: anaconda3
+    state: upgraded
 - name: Make sure it is all up-to-date
   homebrew:
     update_homebrew: yes
     upgrade_all: yes
+- name: Ensure linuxbrew repo permissions again
+  file:
+    path: "{{ syspath }}/.linuxbrew"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    recurse: yes
+    follow: false
+    modification_time: "preserve"

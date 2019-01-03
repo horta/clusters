@@ -1,11 +1,18 @@
 ---
-tasks:
+- name: Create syspath
+  file:
+    path: "{{ syspath }}"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    state: directory
 - name: Set up syspath permissions
   file:
     path: "{{ syspath }}"
     owner: horta
     group: stegle-group
     mode: 0755
+    modification_time: "preserve"
 - name: Set bashrc
   template:
     src: sys-bashrc.j2
@@ -20,3 +27,12 @@ tasks:
     owner: horta
     group: stegle-group
     mode: 0555
+- name: Create ~/.bashrc
+  template:
+    src: user-bashrc.j2
+    dest: ~/.bashrc
+    owner: horta
+    group: stegle-group
+    mode: "u=rwx,g=rx,o="
+    backup: yes
+
