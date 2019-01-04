@@ -4,3 +4,4 @@
   roles:
     - stegle-base
     - linuxbrew
+    - anaconda

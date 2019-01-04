@@ -6,17 +6,13 @@
     version: master
     update: no
     depth: 1
-- name: Ensure linuxbrew repo permissions
+- name: Create linuxbrew/bin directory
   file:
-    path: "{{ syspath }}/.linuxbrew"
+    path: "{{ syspath }}/.linuxbrew/bin"
     owner: horta
     group: stegle-group
     mode: 0755
-    recurse: yes
-    follow: false
-    modification_time: "preserve"
-- name: Create linuxbrew/bin directory
-  file: path="{{ syspath }}/.linuxbrew/bin" state=directory
+    state: directory
 - name: Link brew to bin folder
   file:
     src: "{{ syspath }}/.linuxbrew/Homebrew/bin/brew"
@@ -28,13 +24,6 @@
   homebrew:
     update_homebrew: yes
     upgrade_all: yes
-- name: Install rust
-  environment: "{{homebrew_temp}}"
-  async: 14400
-  poll: 50
-  homebrew:
-    name:
-      - rust
 - name: Install linux headers
   environment: "{{homebrew_temp}}"
   homebrew:
@@ -125,27 +114,28 @@
 - name: Install terminal helpers
   homebrew:
     name:
-      - bat
       - tldr
+      - parallel
+- name: Install fuzzy search
+  homebrew:
+    name:
       - fzf
       - fzy
+- name: Install terminal downloaders
+  homebrew:
+    name:
       - wget
-      - parallel
 - name: Install misc libraries
   homebrew:
     name:
       - libgcrypt
       - libidn
       - libtiff
-- name: Install anaconda3
-  homebrew_cask:
-    name: anaconda3
-    state: upgraded
 - name: Make sure it is all up-to-date
   homebrew:
     update_homebrew: yes
     upgrade_all: yes
-- name: Ensure linuxbrew repo permissions again
+- name: Ensure linuxbrew repo permissions
   file:
     path: "{{ syspath }}/.linuxbrew"
     owner: horta

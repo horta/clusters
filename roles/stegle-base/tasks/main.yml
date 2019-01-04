@@ -6,33 +6,60 @@
     group: stegle-group
     mode: 0755
     state: directory
-- name: Set up syspath permissions
+- name: Create syspath/bin
   file:
-    path: "{{ syspath }}"
+    path: "{{ syspath }}/bin"
     owner: horta
     group: stegle-group
     mode: 0755
-    modification_time: "preserve"
-- name: Set bashrc
+    state: directory
+- name: Create syspath/bin/stegle
+  template:
+    src: stegle.j2
+    dest: "{{ syspath }}/bin/stegle"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+- name: Copy plink
+  copy:
+    src: files/plink
+    dest: "{{ syspath }}/bin/plink"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+- name: Copy plink2
+  copy:
+    src: files/plink2
+    dest: "{{ syspath }}/bin/plink2"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+- name: Copy transfer
+  copy:
+    src: files/transfer
+    dest: "{{ syspath }}/bin/transfer"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+- name: Create bashrc
   template:
     src: sys-bashrc.j2
     dest: "{{ syspath }}/.bashrc{{ sysver }}"
     owner: horta
     group: stegle-group
-    mode: 0555
-- name: Set bashrc.cfg
+    mode: 0755
+- name: Create bashrc.cfg
   template:
     src: sys-bashrc.cfg.j2
     dest: "{{ syspath }}/.bashrc{{ sysver }}.cfg"
     owner: horta
     group: stegle-group
-    mode: 0555
+    mode: 0755
 - name: Create ~/.bashrc
   template:
     src: user-bashrc.j2
     dest: ~/.bashrc
     owner: horta
     group: stegle-group
-    mode: "u=rwx,g=rx,o="
+    mode: 0755
     backup: yes
-

@@ -1,0 +1,34 @@
+#!/bin/env bash
+
+nargs=$#
+cmd="$1"
+mypath="`dirname \"$0\"`"
+
+usage_msg="Usage: stegle [help|status]"
+
+if [ $nargs -ne 1 ]; then
+  echo $usage_msg
+  exit 0
+fi
+
+if [ "$cmd" = "help" ]; then
+  echo "Links"
+  echo "    Stegle wiki http://stegle0.windows.ebi.ac.uk"
+  echo "    Help        http://tsc.ebi.ac.uk"
+  echo "    Intranet    http://intranet.ebi.ac.uk"
+  echo "    Printing    http://tsc.ebi.ac.uk/article/desktop/printing/follow-me-printing"
+  echo "Variables"
+  echo "    MYDATA      $MYDATA"
+  echo "    MYSOFTWARE  $MYSOFTWARE"
+  echo "    MYCONDA     $MYCONDA"
+  echo "Announcement"
+  echo "    For conda environment activation in bsub jobs, prefer doing the"
+  echo "    following:"
+  echo "        conda activate myenv && bsub ./myscript"
+  echo "    If you really want to activate the environment only when you are"
+  echo "    inside a bsub job, do the following:"
+  echo "        bsub \"source activate myenv && ./myscript\""
+  echo "Type 'stegle help' for showing this text again."
+elif [ "$cmd" = "help" ]; then
+  echo $usage_msg
+fi

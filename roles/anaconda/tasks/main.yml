@@ -27,6 +27,31 @@
         path: ~/{{anaconda_installer_sh}}
         state: absent
 
+- name: Link anaconda folder
+  file:
+    src: '{{anaconda_install_dir}}'
+    dest: '{{anaconda_link_dir}}'
+    state: link
+
+- name: Remove files from anaconda/pkgs
+  shell: cd {{ anaconda_link_dir }}/pkgs && find -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf --
+
+- name: Fix anaconda/pkgs permission
+  file:
+    path: "{{ anaconda_link_dir }}/pkgs"
+    state: directory
+    mode: 0555
+
 - name: Update conda packages
   when: anaconda_pkg_update
   command: '{{anaconda_install_dir}}/bin/conda update -y --all'
+
+- name: Ensure anaconda permissions
+  file:
+    path: "{{anaconda_install_dir}}"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    recurse: yes
+    follow: false
+    modification_time: "preserve"
