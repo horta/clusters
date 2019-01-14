@@ -37,6 +37,7 @@
       - luarocks
       - jdk
       - node
+      - ruby
 - name: Install shells
   homebrew:
     name:
