@@ -25,7 +25,6 @@
     update_homebrew: yes
     upgrade_all: yes
 - name: Install linux headers
-  environment: "{{homebrew_temp}}"
   homebrew:
     name:
       - linux-headers
@@ -38,6 +37,8 @@
       - jdk
       - node
       - ruby
+      - cpanminus
+      - perl
 - name: Install shells
   homebrew:
     name:
@@ -101,6 +102,7 @@
     name:
       - git
       - git-lfs
+      - hg
 - name: Install terminal multiplexers
   homebrew:
     name:

@@ -44,20 +44,12 @@ export PATH=$SYSTEM/bin:$PATH
 export MANPATH=$HOMEBREW_PREFIX/share/man:$MANPATH
 export INFOPATH=$HOMEBREW_PREFIX/share/info:$INFOPATH
 
-if [ -d /scratch ];
-then
-    export TMP=/scratch
-    export TEMP=$TMP
-    export TMPDIR=$TMP
-    export HOMEBREW_TEMP=$TMP
-fi
-
 export MYDATA=${config[MYDATA]}/`whoami`
 export MYSOFTWARE=${config[MYSOFTWARE]}/`whoami`
 export MYCONDA=$MYSOFTWARE/conda-envs
 export CONDA_ENVS_PATH=$MYCONDA
 export CLUSTER_NAME=${config[CLUSTER_NAME]}
-export XDG_RUNTIME_DIR=""
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export LC_ALL="en_US.UTF-8"
 
 export EDITOR="vim"

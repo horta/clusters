@@ -3,5 +3,4 @@
   hosts: clusters
   roles:
     - stegle-base
-    - linuxbrew
-    - anaconda
+    - protect

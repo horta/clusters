@@ -1,0 +1,10 @@
+---
+- name: Ensure that the system is protected against change
+  file:
+    path: "{{ syspath }}"
+    owner: horta
+    group: stegle-group
+    mode: 0555
+    recurse: yes
+    follow: false
+    modification_time: "preserve"

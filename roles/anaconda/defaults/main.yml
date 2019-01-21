@@ -26,15 +26,3 @@ anaconda_link_subdir: anaconda
 anaconda_pkg_update: True
 
 anaconda_parent_dir: "{{syspath}}"
-
-# install a a list of packages into the root conda env. please consider using conda envs effectively!
-#anaconda_install_packages:
-#  - package1
-#  - package2
-
-# control the install channels
-#anaconda_install_channels: "defaults conda-forge bioconda"
-
-# additional control over windows-installer specific options
-# win_anaconda_installation_type: JustMe
-# win_anaconda_add_to_path: True

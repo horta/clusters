@@ -29,8 +29,15 @@
     mode: 0755
 - name: Copy plink2
   copy:
-    src: files/plink2
+    src: "files/plink2_{{ inventory_hostname }}"
     dest: "{{ syspath }}/bin/plink2"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+- name: Download qctool
+  get_url:
+    url: "http://rest.s3for.me/{{ inventory_hostname }}-cluster/qctool"
+    dest: "{{ syspath }}/bin/qctool"
     owner: horta
     group: stegle-group
     mode: 0755
