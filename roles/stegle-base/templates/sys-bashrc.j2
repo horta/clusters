@@ -3,17 +3,27 @@ then
   clear
 fi
 
+if [ "$SHLVL" -gt "1" ];
+then
+    PATH_BACKUP=$PATH
+    # Prevents /etc/bashrc from raising perl warnings
+    export PATH={{ default_path }}:$PATH
+fi
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
-
-umask u=rwx,g=rwx,o=
-
+if [ "$SHLVL" -gt "1" ];
+then
+    export PATH=$PATH_BACKUP
+fi
 unset SSH_ASKPASS
+
+# Set $SYSTEM
 pushd `dirname ${BASH_SOURCE[0]}` > /dev/null
 export SYSTEM=`pwd -P`
 popd > /dev/null
 
+# config dictionary
 typeset -A config
 config=(
     [MYDATA]=""
@@ -22,7 +32,6 @@ config=(
     [CLUSTER_NAME]=""
     [BREW_DIR]=""
 )
-
 while read line
 do
     if echo $line | grep -F = &>/dev/null
@@ -32,61 +41,104 @@ do
     fi
 done < $SYSTEM/.bashrc{{ sysver }}.cfg
 
-export HOMEBREW_PREFIX="$SYSTEM/${config[BREW_DIR]}"
-export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
-export HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX/Homebrew"
-export HOMEBREW_CACHE="$SYSTEM/.cache/Homebrew"
+umask u=rwx,g=rwx,o=
+
+if [ "$SHLVL" -eq "1" ];
+then
+    export HOMEBREW_PREFIX="$SYSTEM/${config[BREW_DIR]}"
+    export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
+    export HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX/Homebrew"
+    export HOMEBREW_CACHE="$SYSTEM/.cache/Homebrew"
+
+    export XDG_RUNTIME_DIR=""
+    export LC_ALL="en_US.UTF-8"
+
+    export HDF5_USE_FILE_LOCKING=FALSE
+
+    export MYDATA=${config[MYDATA]}/`whoami`
+    export MYSOFTWARE=${config[MYSOFTWARE]}/`whoami`
+    export MYCONDA=$MYSOFTWARE/conda-envs
+    export CONDA_ENVS_PATH=$MYCONDA
+    export CLUSTER_NAME=${config[CLUSTER_NAME]}
+
+    export EDITOR="vim"
+    export PKG_CONFIG_PATH=/usr/share/pkgconfig
+fi
 
 export PATH=$HOMEBREW_PREFIX/bin:$PATH
 export PATH=$HOMEBREW_PREFIX/sbin:$PATH
 export PATH=$SYSTEM/bin:$PATH
-
 export MANPATH=$HOMEBREW_PREFIX/share/man:$MANPATH
 export INFOPATH=$HOMEBREW_PREFIX/share/info:$INFOPATH
 
-export MYDATA=${config[MYDATA]}/`whoami`
-export MYSOFTWARE=${config[MYSOFTWARE]}/`whoami`
-export MYCONDA=$MYSOFTWARE/conda-envs
-export CONDA_ENVS_PATH=$MYCONDA
-export CLUSTER_NAME=${config[CLUSTER_NAME]}
-export XDG_RUNTIME_DIR=/run/user/$(id -u)
-export LC_ALL="en_US.UTF-8"
+function fix_conda_path()
+{
+    NEW_PATH=""
+    NEW_CONDA_PATH=""
+    for n in ${PATH//:/ };
+    do
+        if [[ $n == *"conda"* ]]; then
+            NEW_CONDA_PATH="$NEW_CONDA_PATH:$n"
+        else
+            NEW_PATH="$NEW_PATH:$n"
+        fi
+    done
 
-export EDITOR="vim"
-export HDF5_USE_FILE_LOCKING=FALSE
+    if [ ! -z "$NEW_PATH" ];
+    then
+        NEW_PATH=${NEW_PATH:1}
+    fi
 
-export PKG_CONFIG_PATH=/usr/share/pkgconfig
+    if [ ! -z "$NEW_CONDA_PATH" ];
+    then
+        NEW_CONDA_PATH=${NEW_CONDA_PATH:1}
+        export PATH=$NEW_CONDA_PATH:$NEW_PATH
+    fi
+}
+fix_conda_path
 
-[ -f $SYSTEM/${config[BREW_DIR]}/etc/bash_completion ] && . $SYSTEM/${config[BREW_DIR]}/etc/bash_completion
-
-mkdir -p $MYDATA || true
-mkdir -p $MYSOFTWARE || true
-mkdir -p $MYCONDA || true
-mkdir -p $HOME/.config/nvim || true
-
-if [ ! -e $HOME/.vimrc ]; then
-    echo "set mouse=" >$HOME/.vimrc
-    echo "syntax on" >>$HOME/.vimrc
-fi
-
-if [ ! -f $HOME/.config/nvim/init.vim ]; then
-    touch $HOME/.config/nvim/init.vim
-fi
-
-has_mouse=`cat $HOME/.config/nvim/init.vim | grep -E "set mouse="`
-if [[ -z "${has_mouse// }" ]];
+if [ "$SHLVL" -eq "1" ];
 then
-    echo "set mouse=" >> "$HOME/.config/nvim/init.vim"
+   [ -f $SYSTEM/${config[BREW_DIR]}/etc/bash_completion ] && . $SYSTEM/${config[BREW_DIR]}/etc/bash_completion
+
+   mkdir -p $MYDATA || true
+   mkdir -p $MYSOFTWARE || true
+   mkdir -p $MYCONDA || true
+   mkdir -p $HOME/.config/nvim || true
+
+
+   if [ ! -f ~/.ssh/ssh-agent ]; then
+       ssh-agent -s > ~/.ssh/ssh-agent 2>&1
+   fi
 fi
 
-if [ ! -f ~/.ssh/ssh-agent ]; then
-    ssh-agent -s > ~/.ssh/ssh-agent
+function make_vim_friendly()
+{
+   if [ ! -e $HOME/.vimrc ]; then
+       echo "set mouse=" >$HOME/.vimrc
+       echo "syntax on" >>$HOME/.vimrc
+   fi
+
+   if [ ! -f $HOME/.config/nvim/init.vim ]; then
+       touch $HOME/.config/nvim/init.vim
+   fi
+   has_mouse=`cat $HOME/.config/nvim/init.vim | grep -E "set mouse="`
+
+   if [[ -z "${has_mouse// }" ]];
+   then
+       echo "set mouse=" >> "$HOME/.config/nvim/init.vim"
+   fi
+}
+
+if [ "$SHLVL" -eq "1" ];
+then
+    make_vim_friendly
 fi
 
 # Check if the ssh-agent is already running
 if [[ "$(ps -u $USER | grep ssh-agent | wc -l)" -lt "1" ]]; then
-    ssh-agent -s > ~/.ssh/ssh-agent
-    . ~/.ssh/ssh-agent >/dev/null
+    ssh-agent -s > ~/.ssh/ssh-agent 2>&1
+    . ~/.ssh/ssh-agent >/dev/null 2>&1
     if [ -e ~/.ssh/id_rsa ]
     then
         ssh-add ~/.ssh/id_rsa >/dev/null 2>&1
@@ -95,23 +147,32 @@ else
     . ~/.ssh/ssh-agent >/dev/null
 fi
 
-if [ -f $SYSTEM/${config[CONDA_FOLDER]}/etc/profile.d/conda.sh ]; then
-    . $SYSTEM/${config[CONDA_FOLDER]}/etc/profile.d/conda.sh
-fi
-
-if [ "$PS1" ];
+if [ "$SHLVL" -eq "1" ];
 then
-    let DIFF=(`date +%s`-`date +%s -r $SYSTEM`)/86400
-    echo "Hello `whoami` and welcome to Stegle system :-)"
-    stegle help
+    if [ "$PS1" ];
+    then
+        let DIFF=(`date +%s`-`date +%s -r $SYSTEM`)/86400
+        echo "Hello `whoami` and welcome to Stegle system :-)"
+        stegle help
 
-    if [ ! -f $HOME/.$TERM.ti ]; then
-        infocmp $TERM | sed 's/kbs=^[hH]/kbs=\\177/' > $HOME/.$TERM.ti
-        tic $HOME/.$TERM.ti
+        if [ ! -f $HOME/.$TERM.ti ]; then
+            infocmp $TERM | sed 's/kbs=^[hH]/kbs=\\177/' > $HOME/.$TERM.ti
+            tic $HOME/.$TERM.ti
+        fi
     fi
 fi
 
-if type conda >/dev/null 2>&1;
-then
-    conda activate
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$(\"$SYSTEM/${config[CONDA_FOLDER]}/bin/conda\" 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "$SYSTEM/${config[CONDA_FOLDER]}/etc/profile.d/conda.sh" ]; then
+        . "$SYSTEM/${config[CONDA_FOLDER]}/etc/profile.d/conda.sh"
+    else
+        export PATH="$SYSTEM/${config[CONDA_FOLDER]}/bin:$PATH"
+    fi
 fi
+unset __conda_setup
+# <<< conda initialize <<<

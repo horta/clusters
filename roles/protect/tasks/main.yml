@@ -8,3 +8,21 @@
     recurse: yes
     follow: false
     modification_time: "preserve"
+- name: Except conda pkgs for me
+  file:
+    path: "{{ syspath }}/anaconda/pkgs"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    recurse: yes
+    follow: false
+    modification_time: "preserve"
+- name: And .cache
+  file:
+    path: "{{ syspath }}/.cache"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    recurse: yes
+    follow: false
+    modification_time: "preserve"

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 hosts="yoda-login ebi-login"
-declare -a progs=('ls' 'type brew' 'vim --version' 'nvim --version' 'samtools --version'
-'wget --version' 'curl --version' 'emacs --version' 'plink --version'
+declare -a progs=('ls' 'type brew' 'conda --version' 'vim --version' 'nvim --version'
+'samtools --help' 'wget --version' 'curl --version' 'emacs --version' 'plink --version'
 'plink2 --version; [ $? == 9 ]' 'conda --version' 'cmake --version' 'fish --help'
 'zsh --version' 'pbzip2 --version' 'python --version' 'vcftools --help'
 'htop --version' 'tar --version' 'gcc --version' 'hg --version' 'git --version'
@@ -62,12 +62,21 @@ function fail
 }
 
 for host in $hosts; do
-    echo "$host:"
+    echo "$host: "
+
+    rpath=$(ssh $host 'echo $PATH' 2>&3)
+    IFS=':' read -r -a rpath <<< "$rpath"
+    echo "PATH: "
+    echo -n "  ${rpath[0]} " && [[ ${rpath[0]} == */condabin ]] && ok || fail
+    echo -n "  ${rpath[1]} " && [[ ${rpath[1]} == *system/bin ]] && ok || fail
+    echo -n "  ${rpath[2]} " && [[ ${rpath[2]} == */.linuxbrew/sbin ]] && ok || fail
+
     echo "$host:" >&3
     for prog in "${progs[@]}"
     do
         name=$(echo $prog | head -n1 | awk '{print $1;}')
         echo -n "Testing $name... "
+        echo "Testing $name... " >&3
         if ssh $host "$prog" >/dev/null 2>&3
         then
             ok

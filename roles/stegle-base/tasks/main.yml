@@ -20,6 +20,28 @@
     owner: horta
     group: stegle-group
     mode: 0755
+- name: Create bashrc
+  template:
+    src: sys-bashrc.j2
+    dest: "{{ syspath }}/.bashrc{{ sysver }}"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+- name: Create bashrc.cfg
+  template:
+    src: sys-bashrc.cfg.j2
+    dest: "{{ syspath }}/.bashrc{{ sysver }}.cfg"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+- name: Create ~/.bashrc
+  template:
+    src: user-bashrc.j2
+    dest: ~/.bashrc
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    backup: yes
 - name: Copy plink
   copy:
     src: files/plink
@@ -48,25 +70,3 @@
     owner: horta
     group: stegle-group
     mode: 0755
-- name: Create bashrc
-  template:
-    src: sys-bashrc.j2
-    dest: "{{ syspath }}/.bashrc{{ sysver }}"
-    owner: horta
-    group: stegle-group
-    mode: 0755
-- name: Create bashrc.cfg
-  template:
-    src: sys-bashrc.cfg.j2
-    dest: "{{ syspath }}/.bashrc{{ sysver }}.cfg"
-    owner: horta
-    group: stegle-group
-    mode: 0755
-- name: Create ~/.bashrc
-  template:
-    src: user-bashrc.j2
-    dest: ~/.bashrc
-    owner: horta
-    group: stegle-group
-    mode: 0755
-    backup: yes
