@@ -20,6 +20,24 @@
     owner: horta
     group: stegle-group
     state: link
+- name: Ensure linuxbrew write permission
+  file:
+    path: "{{ syspath }}/.linuxbrew"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    recurse: yes
+    follow: false
+    modification_time: "preserve"
+- name: Ensure cache write permission
+  file:
+    path: "{{ syspath }}/.cache"
+    owner: horta
+    group: stegle-group
+    mode: 0755
+    recurse: yes
+    follow: false
+    modification_time: "preserve"
 - name: Update homebrew and upgrade all packages
   homebrew:
     update_homebrew: yes
@@ -103,6 +121,7 @@
       - git
       - git-lfs
       - hg
+      - ipfs
 - name: Install terminal multiplexers
   homebrew:
     name:
@@ -138,12 +157,3 @@
   homebrew:
     update_homebrew: yes
     upgrade_all: yes
-- name: Ensure linuxbrew repo permissions
-  file:
-    path: "{{ syspath }}/.linuxbrew"
-    owner: horta
-    group: stegle-group
-    mode: 0755
-    recurse: yes
-    follow: false
-    modification_time: "preserve"

@@ -2,8 +2,11 @@ if [ -f {{ syspath }}/.bashrc{{ sysver }} ]; then
     . {{ syspath }}/.bashrc{{ sysver }}
 fi
 
-if [ $(basename $SHELL) != "fish" ];
+if [ "$PS1" ];
 then
-    fish
-    exit
+     if [ $(basename $SHELL) != "fish" ];
+     then
+         fish
+         exit
+     fi
 fi

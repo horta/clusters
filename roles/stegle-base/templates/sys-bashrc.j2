@@ -76,9 +76,20 @@ then
     export PKG_CONFIG_PATH=/usr/share/pkgconfig
 fi
 
+# Setup GO
+if [ -z "$GOPATH" ];
+then
+    export GOPATH=$HOME/go
+fi
+if [ "$SHLVL" -eq "1" ];
+then
+    mkdir -p $GOPATH || true
+fi
+
 export PATH=$HOMEBREW_PREFIX/bin:$PATH
 export PATH=$HOMEBREW_PREFIX/sbin:$PATH
 export PATH=$SYSTEM/bin:$PATH
+export PATH=$GOPATH/bin:$PATH
 export MANPATH=$HOMEBREW_PREFIX/share/man:$MANPATH
 export INFOPATH=$HOMEBREW_PREFIX/share/info:$INFOPATH
 

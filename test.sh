@@ -68,8 +68,9 @@ for host in $hosts; do
     IFS=':' read -r -a rpath <<< "$rpath"
     echo "PATH: "
     echo -n "  ${rpath[0]} " && [[ ${rpath[0]} == */condabin ]] && ok || fail
-    echo -n "  ${rpath[1]} " && [[ ${rpath[1]} == *system/bin ]] && ok || fail
-    echo -n "  ${rpath[2]} " && [[ ${rpath[2]} == */.linuxbrew/sbin ]] && ok || fail
+    echo -n "  ${rpath[1]} " && [[ ${rpath[1]} == */go/bin ]] && ok || fail
+    echo -n "  ${rpath[2]} " && [[ ${rpath[2]} == *system/bin ]] && ok || fail
+    echo -n "  ${rpath[3]} " && [[ ${rpath[3]} == */.linuxbrew/sbin ]] && ok || fail
 
     echo "$host:" >&3
     for prog in "${progs[@]}"
